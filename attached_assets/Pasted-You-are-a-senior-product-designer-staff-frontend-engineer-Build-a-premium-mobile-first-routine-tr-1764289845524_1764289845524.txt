@@ -1,0 +1,221 @@
+You are a senior product designer + staff frontend engineer. Build a premium mobile-first routine tracker web app with an interface inspired by the CRED credit-card app style: dark, minimal, luxury, smooth, and addictive to use daily. Do NOT copy CRED assets, icons, fonts, or exact screens. Create an original design that feels similar in vibe: premium dark UI, bold typography, clean cards, subtle gradients, crisp motion, and satisfying micro-interactions.
+
+CORE PRODUCT
+A routine tracker where:
+- I have a default daily routine (preloaded on first launch)
+- I can edit blocks/tasks anytime (times, order, names, must-do)
+- I check tasks each day
+- The app auto-saves offline
+- It has a Snapchat-like streak system (streak kept if rules satisfied)
+- It has calendar history + stats
+- It feels effortless and beautiful on iPhone (Chrome/Safari)
+
+PLATFORM REQUIREMENTS (STRICT)
+- Mobile-first: perfect for 320–430px width.
+- FULLY responsive up to tablet + desktop.
+- No horizontal overflow anywhere.
+- Touch targets >= 44x44px for primary actions.
+- Add:
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+- Support iPhone safe areas:
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+- Accessibility: semantic HTML, labels, ARIA where needed, keyboard nav, visible focus rings, good contrast, supports prefers-reduced-motion.
+- Performance: smooth 60fps scrolling; avoid heavy stacked shadows; keep animations subtle.
+
+TECH STACK (IMPLEMENT FULLY)
+Use: React + TypeScript + Vite (or Next.js if you prefer). Tailwind is OK, but keep it clean and token-driven. Do not add big UI libraries.
+Offline-first storage: IndexedDB preferred (fallback to localStorage if needed).
+Add PWA support if possible (manifest + service worker) so it can be “Add to Home Screen”.
+
+INFORMATION ARCHITECTURE (SCREENS)
+Use a bottom navigation (CRED-like) with 4–5 tabs:
+1) Today
+2) Calendar
+3) Edit Routine
+4) Stats
+5) Settings (optional; can be a sheet from Today)
+
+TODAY SCREEN (FAST DAILY FLOW)
+- Top: Today + date, subtle greeting text (optional), and a compact settings icon.
+- Big Streak Card (hero):
+  - 🔥 Current streak + Best streak
+  - Status for today: “On track / At risk / Completed”
+  - One-line guidance: “Complete must-dos to keep streak”
+- Progress bar + % completed
+- Routine blocks as premium collapsible cards (accordion):
+  - Each block shows: name + time range + completion count (e.g., 3/6)
+  - Expand reveals tasks as large tappable rows
+- Task rows:
+  - Large checkbox with satisfying toggle animation
+  - Task title
+  - Optional “Must-do” pill/badge
+  - Long-press or swipe for quick actions (optional)
+- Auto-expand the current time block (based on device time). If none matches, expand Morning block.
+- Add a quick “Mark today done” celebration if streak conditions met (subtle, not childish)
+
+EDIT ROUTINE (TEMPLATE EDITOR)
+- Edit blocks:
+  - name, start/end time
+  - reorder blocks (drag & drop)
+  - delete with confirmation sheet
+- Edit tasks:
+  - add/edit/delete
+  - reorder tasks
+  - toggle Must-do
+- The editor must feel clean and not cluttered: use bottom sheets/modals for editing forms.
+- Provide “Reset to default routine” option with confirmation.
+
+CALENDAR / HISTORY
+- Month grid with day states:
+  - streak kept (completed)
+  - partial
+  - missed (streak broken)
+  - freeze used (optional state)
+- Tap a date => opens Day Detail sheet:
+  - shows tasks with completion checks for that date
+  - notes (optional)
+  - allow editing log (but warn if it affects streak)
+
+STATS
+- 7-day and 30-day completion rate
+- Total tasks completed
+- Streak timeline (simple SVG line or bars, no heavy chart libs)
+- “Most missed tasks” list
+
+SETTINGS (LIGHTWEIGHT)
+- Completion threshold slider (default 80%)
+- Streak Freeze:
+  - enable/disable
+  - allowance: 1 per 7 days (if implemented)
+- Theme: Dark default (light optional)
+- Export/Import JSON backup
+- Privacy note: data stays local unless user exports/imports
+
+STREAK RULES (SNAPCHAT FEEL)
+A day is “streak kept” if:
+A) all Must-do tasks are completed
+OR
+B) overall completion >= threshold (default 80%)
+Optional: Streak Freeze (1 per 7 days) can save one missed day. Show freeze availability clearly.
+Streak is date-based (YYYY-MM-DD). Handle missed days correctly (no cheating with device time; just be consistent).
+
+DATA MODEL (IMPLEMENT)
+- routineTemplate:
+  blocks[] {
+    id, name, startTime, endTime, order,
+    tasks[] { id, title, mustDo, order }
+  }
+- dailyLogs indexed by date:
+  { completedTaskIds[], notes?, lastUpdated }
+- streakState:
+  { currentStreak, bestStreak, lastStreakDate, freezeLedger? }
+
+DEFAULT ROUTINE (SEED ON FIRST LAUNCH ONLY)
+If no routineTemplate exists in storage, seed it exactly like this and allow full editing later:
+
+BLOCK 1: Morning Reset (06:30–07:10)
+- Wake up at 6:30 (must-do)
+- Black coffee
+- Read 5 pages (book)
+- Coconut oil (oil pulling)
+- Brush teeth
+- Shower
+
+BLOCK 2: Skills Sprint (07:10–08:20)
+- English speaking practice (record yourself)
+- Sales call practice hardcore
+- Objection handling practice (price / follow-up / closing)
+
+BLOCK 3: Gym (08:30–10:30)
+- Leave for gym
+- Workout (strength/cardio) (must-do)
+- Stretching/cooldown
+
+BLOCK 4: Post Gym + Meals (10:30–12:30)
+- Shower + get fresh
+- Breakfast / post-workout meal
+- Lunch finished by 12:30
+
+BLOCK 5: Mandarin (11:20–12:00)  [Yes, overlaps meals; user can edit]
+- Mandarin vocab + pronunciation
+- Listening + repeat (shadowing)
+
+BLOCK 6: Business with father (12:30–18:00)
+- Go for business with father (must-do)
+- Daily target: follow-ups + payment reminders
+- Daily target: 5 new outreach messages
+- Daily target: 2 sales calls
+- Daily target: quotes + order tracking
+- Daily target: vendor coordination / quality checks
+
+BLOCK 7: Content Creation (18:00–19:30)
+- Record content for platforms (must-do)
+- Post / schedule
+- Reply to comments/messages
+
+BLOCK 8: Dinner (19:30–20:15)
+- Dinner
+
+BLOCK 9: Editing Focus (20:15–21:45)
+- Edit today’s content
+- Upload/export final
+
+BLOCK 10: Walk (22:00–22:30)
+- Walk at 10:00 pm (must-do)
+
+BLOCK 11: Chill + Wind Down (22:30–23:30)
+- Chill / fun (light)
+- Sleep routine (no heavy work)
+- Sleep by 11:30 (must-do)
+
+DEFAULT SETTINGS
+- completion threshold: 80%
+- dark theme ON
+- streak freeze ON (1 per 7 days) if implemented
+
+UI/UX STYLE (CRED-LIKE VIBE, ORIGINAL EXECUTION)
+Design language:
+- Dark luxury background with subtle gradient noise (very faint)
+- Cards: glassy panels / soft blur, thin borders, rounded corners
+- Typography: big bold headings, clean readable body, strong hierarchy
+- Spacing: consistent 8/12/16/24 scale
+- Icons: simple, consistent stroke set (original)
+- Animations: short, smooth, expensive-feeling
+  - 120–180ms for taps
+  - 200–280ms for sheet transitions
+  - Respect prefers-reduced-motion
+
+Interaction patterns:
+- Bottom sheets for editing and confirmations
+- Swipe/drag affordances subtle
+- “Today” feels like a dashboard; edit screens feel utilitarian but still premium
+- Completion toggle has a satisfying “snap” animation + subtle glow
+- Streak kept triggers a tiny celebration (micro confetti or glow ripple) once per day max
+
+DESIGN TOKENS (CREATE)
+Implement CSS variables or a TS theme file:
+- colors: bg, panel, panel2, text, muted, border, accent, success, warning, danger
+- radii: sm/md/lg
+- shadows: minimal (avoid heavy)
+- typography scale with clamp()
+- spacing scale
+
+DELIVERABLES
+1) Complete working code (no pseudocode).
+2) Clean folder structure + reusable components.
+3) A short explanation of:
+   - mobile layout choices
+   - streak logic
+   - storage approach
+4) QA checklist for iPhone Chrome/Safari:
+   - no overflow
+   - safe area padding
+   - large tap targets
+   - offline persistence
+   - smooth animations
+   - accessibility + reduced motion
+
+IMPORTANT
+- Do not ask follow-up questions. Make reasonable assumptions and build it end-to-end.
+- Keep it simple and addictive. Daily use must be 10/10.
