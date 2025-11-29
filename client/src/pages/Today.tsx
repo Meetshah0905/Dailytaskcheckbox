@@ -1,18 +1,21 @@
 import React, { useState, useMemo } from 'react';
 import Layout from '@/components/Layout';
 import { useApp } from '@/lib/store';
-import { format } from 'date-fns';
+import { format, subDays, isSameDay, parseISO } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Flame, Check, MoreHorizontal, Settings2 } from 'lucide-react';
+import { ChevronDown, Flame, Check, MoreHorizontal, Settings2, Calendar as CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import * as Accordion from '@radix-ui/react-accordion';
 import { Progress } from '@/components/ui/progress';
 import { Link } from 'wouter';
+import { Button } from '@/components/ui/button';
 
 export default function Today() {
   const { routine, logs, streak, toggleTask } = useApp();
   const today = format(new Date(), 'yyyy-MM-dd');
-  const currentLog = logs[today] || { completedTaskIds: [] };
+  const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
+  const [viewingDate, setViewingDate] = useState<string>(today);
+  const currentLog = logs[viewingDate] || { completedTaskIds: [] };
   
   // Calculate Progress
   const allTasks = useMemo(() => routine.flatMap(b => b.tasks), [routine]);
@@ -39,19 +42,48 @@ export default function Today() {
   return (
     <Layout>
       <div className="px-6 pt-8 pb-4 flex justify-between items-end">
-        <div>
-          <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">
-            {format(new Date(), 'EEEE, MMM do')}
+        <div className="flex-1">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+              {viewingDate === today 
+                ? format(new Date(), 'EEEE, MMM do')
+                : viewingDate === yesterday
+                ? `Yesterday, ${format(parseISO(viewingDate), 'MMM do')}`
+                : format(parseISO(viewingDate), 'EEEE, MMM do')}
+            </div>
+            {viewingDate !== today && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setViewingDate(today)}
+                className="h-6 px-2 text-xs text-primary hover:text-primary/80"
+              >
+                Back to Today
+              </Button>
+            )}
           </div>
           <h1 className="text-3xl font-bold text-foreground">
-            Hello, User
+            {viewingDate === today ? 'Hello, User' : 'Past Tasks'}
           </h1>
         </div>
-        <Link href="/settings">
-            <div className="p-2 rounded-full bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
-                <Settings2 size={20} />
-            </div>
-        </Link>
+        <div className="flex items-center gap-2">
+          {viewingDate === today && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setViewingDate(yesterday)}
+              className="gap-2 bg-secondary/50 hover:bg-secondary border-white/10"
+            >
+              <CalendarIcon size={16} />
+              Yesterday
+            </Button>
+          )}
+          <Link href="/settings">
+              <div className="p-2 rounded-full bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                  <Settings2 size={20} />
+              </div>
+          </Link>
+        </div>
       </div>
 
       {/* Hero Streak Card */}
@@ -135,7 +167,7 @@ export default function Today() {
                         return (
                           <div 
                             key={task.id}
-                            onClick={() => toggleTask(today, task.id)}
+                            onClick={() => toggleTask(viewingDate, task.id)}
                             className="flex items-center gap-4 p-3 rounded-2xl hover:bg-white/5 active:scale-[0.98] transition-all cursor-pointer group/task"
                           >
                             <div className={cn(
